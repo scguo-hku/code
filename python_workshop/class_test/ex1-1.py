@@ -1,0 +1,5 @@
+seconds = int(input())
+m, s = divmod(seconds, 60)
+h, m = divmod(m, 60)
+formatted_time = "%dh %dm %ds" % (h, m, s)
+print(formatted_time)
