@@ -13,7 +13,7 @@ def ucs_search(problem):
     heappush(solutionPath, (0, startState))
     exploredSet = collections.OrderedDict()
     print('Initial frontier:',list(frontier)) 
-    input()
+    # input()
     while frontier:
         node = heappop(frontier)
         path = heappop(solutionPath)
@@ -39,7 +39,7 @@ def ucs_search(problem):
                 # frontier.append(node)
             print(list(frontier))
             print(exploredSet.keys())
-            input()
+            # input()
 
 if __name__ == "__main__":
     test_case_id = int(sys.argv[1])

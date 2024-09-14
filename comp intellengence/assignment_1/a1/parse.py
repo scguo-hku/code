@@ -4,13 +4,13 @@ def read_graph_search_problem(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
     
-    # 提取起始状态
+    # Extract the start state
     start_state = lines[0].strip().split(": ")[1]
     
-    # 提取目标状态列表
+    # Extract the goal state
     goal_states = lines[1].strip().split(": ")[1]
     
-    # 提取启发式值
+    # Extract the heuristics value
     heuristics = {}
     i = 2
     while i < len(lines) and len(lines[i].strip().split()) == 2:
@@ -18,7 +18,7 @@ def read_graph_search_problem(file_path):
         heuristics[state] = float(heuristic)
         i += 1
     
-    # 提取状态转换信息
+    # Extract the transitions value
     transitions = {}
     while i < len(lines):
         start, end, cost = lines[i].strip().split()
@@ -27,7 +27,6 @@ def read_graph_search_problem(file_path):
         transitions[start].append((float(cost), end))
         i += 1
     
-    # 返回搜索问题的内容
     problem = {
         'start_state': start_state,
         'goal_states': goal_states,
@@ -39,7 +38,27 @@ def read_graph_search_problem(file_path):
 
 def read_8queens_search_problem(file_path):
     #Your p6 code here
-    problem = ''
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+    
+    board = []
+    for line in lines:
+        row = []
+        for char in line.strip().split():
+            if char == 'q':
+                row.append(1)
+            else:
+                row.append(0)
+        board.append(row)
+    
+    # Convert the board state to a format suitable for local search algorithms
+    n = len(board)
+    problem = [-1] * n
+    for row_index in range(n):
+        for col_index in range(n):
+            if board[row_index][col_index] == 1:
+                problem[col_index] = row_index
+    
     return problem
 
 if __name__ == "__main__":

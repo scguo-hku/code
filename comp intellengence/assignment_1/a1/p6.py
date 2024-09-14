@@ -2,14 +2,27 @@ import sys, parse, grader
 
 def number_of_attacks(problem):
     #Your p6 code here
-    solution = """18 12 14 13 13 12 14 14
-14 16 13 15 12 14 12 16
-14 12 18 13 15 12 14 14
-15 14 14 17 13 16 13 16
-17 14 17 15 17 14 16 16
-17 17 16 18 15 17 15 17
-18 14 17 15 15 14 17 16
-14 14 13 17 12 14 12 18"""
+    current_state = problem
+    n = len(current_state)
+    
+    def calculate_attacks(board):
+        attacks = 0
+        for i in range(n):
+            for j in range(i + 1, n):
+                if board[i] == board[j] or abs(board[i] - board[j]) == abs(i - j):
+                    attacks += 1
+        return attacks
+    
+    # Generate the attack matrix
+    attack_matrix = [[0] * n for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            temp_board = list(current_state)
+            temp_board[j] = i
+            attack_matrix[i][j] = calculate_attacks(temp_board)
+    
+    # Convert the attack matrix to string format, ensuring that each number is two digits
+    solution = '\n'.join(' '.join(f'{cell:2}' for cell in row) for row in attack_matrix)
     return solution
 
 if __name__ == "__main__":

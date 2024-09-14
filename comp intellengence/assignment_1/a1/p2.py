@@ -10,7 +10,7 @@ def bfs_search(problem):
     solutionPath = collections.deque([startState])
     exploredSet = collections.OrderedDict()
     print('Initial frontier:',list(frontier)) 
-    input()
+    # input()
     while frontier:
         node = frontier.popleft()
         path = solutionPath.popleft()
@@ -36,7 +36,7 @@ def bfs_search(problem):
                 # frontier.append(node)
             print(list(frontier))
             print(exploredSet.keys())
-            input()
+            # input()
 
 if __name__ == "__main__":
     test_case_id = int(sys.argv[1])
