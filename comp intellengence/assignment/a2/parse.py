@@ -1,7 +1,11 @@
 import os, sys
 def read_layout_problem(file_path):
     #Your p1 code here
-    problem = ''
+    problem = {}
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+        problem['seed'] = lines[0].strip().split(': ')[1]  # 获取seed值
+        problem['layout'] = ''.join(lines[1:]).strip()  # 获取layout内容
     return problem
 
 if __name__ == "__main__":
