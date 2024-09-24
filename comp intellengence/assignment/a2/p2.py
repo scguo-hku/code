@@ -14,7 +14,7 @@ def better_play_single_ghosts(problem):
         n = len(layout)
         m = len(layout[0])
         
-        # 找到 Pacman 和 Ghost 的位置
+        # find Pacman and Ghost position
         pacman_pos = None
         ghost_pos = None
         for i in range(n):
@@ -24,7 +24,7 @@ def better_play_single_ghosts(problem):
                 elif layout[i][j] == 'W':
                     ghost_pos = (i, j)
         
-        # 确定 Pacman 可以移动的方向
+        # find Pacman move directions
         pacman_moves = []
         if pacman_pos:
             i, j = pacman_pos
@@ -37,7 +37,7 @@ def better_play_single_ghosts(problem):
             if j < m-1 and layout[i][j+1] != '%':  # East
                 pacman_moves.append('E')
         
-        # 确定 Ghost 可以移动的方向
+        # find Ghost move directions
         ghost_moves = []
         if ghost_pos:
             i, j = ghost_pos
@@ -50,11 +50,11 @@ def better_play_single_ghosts(problem):
             if j < m-1 and layout[i][j+1] != '%':  # East
                 ghost_moves.append('E')
         
-        # 按字母表顺序排序
+        # sort by the alphabet order
         pacman_moves.sort()
         ghost_moves.sort()
         
-        # 输出 Pacman 和 Ghost 可以移动的方向
+        # output Pacman and Ghost directions
         direction = {
             'pacman': pacman_moves,
             'ghost': ghost_moves
@@ -62,9 +62,11 @@ def better_play_single_ghosts(problem):
 
         return direction
     
+    # manhattan distance
     def manhattan_distance(pos1, pos2):
         return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
+    # find nearest Ghost and Food
     def find_nearest_ghost(pacman_pos, ghost_pos):
         return manhattan_distance(pacman_pos, ghost_pos)
 
@@ -80,6 +82,7 @@ def better_play_single_ghosts(problem):
             return 10000
         return min_distance
 
+    # find best move direction
     def best_direction(pacman_pos, ghost_pos, layout, directions):
         best_score = float('-inf')
         best_move = None
@@ -104,7 +107,7 @@ def better_play_single_ghosts(problem):
         return best_move
 
     
-    # 找到 Pacman 和 Ghost 的位置
+    # find Pacman and Ghost position
     pacman_pos = None
     ghost_pos = None
     for i in range(len(layout)):
@@ -119,7 +122,7 @@ def better_play_single_ghosts(problem):
     round_num = 0
     next_char = ' '
     
-    # 输出初始 seed 值和布局
+    # output inintial seed value and layout
     winner = None
     solution = []
     solution.append(f'seed: {seednum}')
@@ -131,7 +134,7 @@ def better_play_single_ghosts(problem):
         # input()
         round_num += 1
         
-        # 获取当前方向
+        # get Pacman and Ghost move directions
         direction = move(layout)
         
         # Pacman move
@@ -150,7 +153,7 @@ def better_play_single_ghosts(problem):
                 layout[new_pacman_pos[0]] = layout[new_pacman_pos[0]][:new_pacman_pos[1]] + ' ' + layout[new_pacman_pos[0]][new_pacman_pos[1]+1:]
             score += PACMAN_MOVING_SCORE
             
-            # 更新布局
+            # update Pacman position
             layout[pacman_pos[0]] = layout[pacman_pos[0]][:pacman_pos[1]] + ' ' + layout[pacman_pos[0]][pacman_pos[1]+1:]
             layout[new_pacman_pos[0]] = layout[new_pacman_pos[0]][:new_pacman_pos[1]] + 'P' + layout[new_pacman_pos[0]][new_pacman_pos[1]+1:]
             pacman_pos = new_pacman_pos
@@ -168,7 +171,7 @@ def better_play_single_ghosts(problem):
                 winner = 'Ghost'
                 break
 
-            # 输出 Pacman 移动后的布局和得分
+            # out Pacman move and layout
             solution.append(f'{round_num}: P moving {pacman_move}')
             round_num += 1
             
@@ -199,16 +202,16 @@ def better_play_single_ghosts(problem):
             if (round_num == 1):
                 continue
             else:
-                # 更新 Ghost 离开的旧位置
+                # Restore the position with food when the ghost leaves
                 if next_char == '.':
                     layout[ghost_pos[0]] = layout[ghost_pos[0]][:ghost_pos[1]] + '.' + layout[ghost_pos[0]][ghost_pos[1]+1:]
                 else:
                     layout[ghost_pos[0]] = layout[ghost_pos[0]][:ghost_pos[1]] + ' ' + layout[ghost_pos[0]][ghost_pos[1]+1:]
                 
-            # 保存 Ghost 即将移动到的新位置的字符
+            # Save the character at the new position where the Ghost is about to move
             next_char = layout[new_ghost_pos[0]][new_ghost_pos[1]]
 
-            # 更新 Ghost 的新位置
+            # update Ghost new position
             layout[new_ghost_pos[0]] = layout[new_ghost_pos[0]][:new_ghost_pos[1]] + 'W' + layout[new_ghost_pos[0]][new_ghost_pos[1]+1:]
             ghost_pos = new_ghost_pos
 
@@ -224,7 +227,7 @@ def better_play_single_ghosts(problem):
                 winner = 'Ghost'
                 break
 
-            # 输出 Ghost 移动后的布局和得分
+            # putput Ghost move and layout
             solution.append(f'{round_num}: W moving {ghost_move}')
             for row in layout:
                 solution.append(row)
