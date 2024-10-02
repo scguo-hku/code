@@ -21,7 +21,7 @@ def bfs_search(problem):
             if node[count:] in heuristic:
                 lastnode = node[count:]
                 break
-        if (node.endswith(goalState)): 
+        if any(node.endswith(goal) for goal in goalState):
             my_set = ' '.join(exploredSet.keys())
             solution = my_set + '\n' + path
             return solution

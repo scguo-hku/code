@@ -24,7 +24,7 @@ def astar_search(problem):
             if node[1][count:] in heuristic:
                 lastnode = node[1][count:]
                 break
-        if (node[1].endswith(goalState)): 
+        if any(node[1].endswith(goal) for goal in goalState): 
             my_set = ' '.join(exploredSet.keys())
             solution = my_set + '\n' + path[1]
             return solution

@@ -8,7 +8,7 @@ def read_graph_search_problem(file_path):
     start_state = lines[0].strip().split(": ")[1]
     
     # Extract the goal state
-    goal_states = lines[1].strip().split(": ")[1]
+    goal_states = lines[1].strip().split(": ")[1].split(" ")
     
     # Extract the heuristics value
     heuristics = {}
