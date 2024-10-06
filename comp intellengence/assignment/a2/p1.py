@@ -62,7 +62,8 @@ def random_play_single_ghost(problem):
         return direction
 
     random.seed(int(seednum), version=1)
-    
+
+    # ················································main iteration·······························································
     # find Pacman and Ghost position
     pacman_pos = None
     ghost_pos = None
@@ -133,7 +134,7 @@ def random_play_single_ghost(problem):
                 solution.append(row)
                 
             # Check if Pacman wins
-            if all('.' not in row for row in layout):
+            if next_char == ' ' and all('.' not in row for row in layout):
                 score += PACMAN_WIN_SCORE
                 game_over = True
                 solution.append(f'score: {score}')

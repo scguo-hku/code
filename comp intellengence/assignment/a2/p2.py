@@ -78,8 +78,10 @@ def better_play_single_ghosts(problem):
                     distance = manhattan_distance(pacman_pos, (i, j))
                     if distance < min_distance:
                         min_distance = distance
+        if min_distance == 0:
+            return 0.01
         if min_distance == float('inf'):
-            return 10000
+            return 100
         return min_distance
 
     # find best move direction
@@ -97,8 +99,14 @@ def better_play_single_ghosts(problem):
             
             ghost_distance = find_nearest_ghost(new_pacman_pos, ghost_pos)
             food_distance = find_nearest_food(new_pacman_pos, layout)
+
+            # Calculate danger score based on nearest ghost
+            if ghost_distance < 2:
+                danger_score = -(2 - ghost_distance) * 10
+            else:
+                danger_score = 0
             
-            score = ghost_distance - food_distance
+            score = ghost_distance/food_distance + danger_score
             
             if score > best_score:
                 best_score = score
@@ -106,7 +114,7 @@ def better_play_single_ghosts(problem):
         
         return best_move
 
-    
+    # ················································main iteration·······························································
     # find Pacman and Ghost position
     pacman_pos = None
     ghost_pos = None
@@ -179,7 +187,7 @@ def better_play_single_ghosts(problem):
                 solution.append(row)
                 
             # Check if Pacman wins
-            if all('.' not in row for row in layout):
+            if next_char == ' ' and all('.' not in row for row in layout):
                 score += PACMAN_WIN_SCORE
                 game_over = True
                 solution.append(f'score: {score}')
