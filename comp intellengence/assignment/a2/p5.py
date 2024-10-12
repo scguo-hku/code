@@ -192,7 +192,7 @@ def min_max_multiple_ghosts(problem, k):
                 best_move = move
             
             alpha = max(alpha, best_value)
-            if beta <= alpha:
+            if beta <= alpha: # current node is more than the min node's best option, prune
                 break
         
         return best_value, best_move
@@ -234,7 +234,7 @@ def min_max_multiple_ghosts(problem, k):
                 best_move = move
             
             beta = min(beta, best_value)
-            if beta <= alpha:
+            if beta <= alpha: # current node is less than the max node's best option, prune
                 break
         
         return best_value, best_move
@@ -257,8 +257,6 @@ def min_max_multiple_ghosts(problem, k):
         solution.append(row)
     
     while not game_over:
-        # input()
-        
         # Pacman move
         _, pacman_move = minimax((pacman_pos, ghost_positions, layout), 0, 0, max_depth)
         new_pacman_pos = {
@@ -303,7 +301,7 @@ def min_max_multiple_ghosts(problem, k):
             solution.append(row)
             
         # Check if Pacman wins
-        # Check if next_char contains any '.' value
+        # Check if next_char contains any '.' value, means there is still food left, just the ghost cover it
         if '.' not in next_char.values():
             if all('.' not in row for row in layout):
                 score += PACMAN_WIN_SCORE

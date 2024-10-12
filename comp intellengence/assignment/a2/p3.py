@@ -141,7 +141,7 @@ def random_play_multiple_ghosts(problem):
                 solution.append(row)
                 
             # Check if Pacman wins
-            # Check if next_char contains any '.' value
+            # Check if next_char contains any '.' value, means there is still food left, just the ghost cover it
             if '.' not in next_char.values():
                 if all('.' not in row for row in layout):
                     score += PACMAN_WIN_SCORE
