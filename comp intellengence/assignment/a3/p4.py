@@ -1,5 +1,23 @@
 '''
-Learned Policy:
+-->How to run<--
+First we need the correct path to the testcase, and choose a path to store the training results. Then
+you can just run the code and it will output the final epsilon, alpha, learned policy and compared policy.
+
+-->Parameters<--
+learningRate: 0.3
+learningRateDecay: 0.99
+minLearningRate: 0.003
+discount: 0.9
+livingReward: -0.04
+episodes: 1000
+max_steps: 100
+epsilon: 1.0
+epsilon_decay: 0.99
+min_epsilon: 0.001
+
+-->Learned Policy<--
+These are the most common results after running many times. The learned policy is not always 
+the same as the compared policy, but I think they are also optimal.
 | E || E || E || x |
 | N || # || N || x |
 | N || W || N || W |
