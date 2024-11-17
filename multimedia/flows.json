@@ -1,0 +1,601 @@
+[
+    {
+        "id": "1ad5761267f9aed3",
+        "type": "tab",
+        "label": "流程 3",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "adfd1469a2cd1635",
+        "type": "inject",
+        "z": "1ad5761267f9aed3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 70,
+        "wires": [
+            [
+                "ed24770302ca7d78"
+            ]
+        ]
+    },
+    {
+        "id": "ed24770302ca7d78",
+        "type": "http request",
+        "z": "1ad5761267f9aed3",
+        "name": "http request",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.csdi.gov.hk/apim/dataquery/api/?id=td_rcd_1638948197838_85279&layer=basic_info_all&limit=150&offset=0",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 400,
+        "y": 70,
+        "wires": [
+            [
+                "bcd4be1ac35f173b"
+            ]
+        ]
+    },
+    {
+        "id": "ca17f4cb7b74fc68",
+        "type": "mongodb3 in",
+        "z": "1ad5761267f9aed3",
+        "service": "_ext_",
+        "configNode": "ecc26120.5c01a8",
+        "name": "",
+        "collection": "Parking",
+        "operation": "insert",
+        "x": 780,
+        "y": 70,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "938062d2acedf9f2",
+        "type": "inject",
+        "z": "1ad5761267f9aed3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 150,
+        "wires": [
+            [
+                "fd029e312f2fe021"
+            ]
+        ]
+    },
+    {
+        "id": "67c833dbf32cd7d4",
+        "type": "mongodb3 in",
+        "z": "1ad5761267f9aed3",
+        "service": "_ext_",
+        "configNode": "ecc26120.5c01a8",
+        "name": "",
+        "collection": "Parking",
+        "operation": "findOne",
+        "x": 210,
+        "y": 250,
+        "wires": [
+            [
+                "9c60609747b00250",
+                "eb46a6422b77b817",
+                "6db09b62b8d2fe9b",
+                "fac8ac2018a12c9a",
+                "e50c395fc563cacb",
+                "a2d3b0dead716ccb"
+            ]
+        ]
+    },
+    {
+        "id": "fd029e312f2fe021",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "查询条件时间降序",
+        "func": "msg.payload = [\n    {\n        \"$query\": {}\n    },\n    {\n        \"sort\": {\n            \"timeStamp\": -1\n        }\n    }\n]\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 200,
+        "y": 200,
+        "wires": [
+            [
+                "67c833dbf32cd7d4"
+            ]
+        ]
+    },
+    {
+        "id": "bcd4be1ac35f173b",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "改日期类型",
+        "func": "if(msg.payload && msg.payload.timeStamp) {\n    msg.payload.timeStamp = new Date(msg.payload.timeStamp);\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 70,
+        "wires": [
+            [
+                "ca17f4cb7b74fc68"
+            ]
+        ]
+    },
+    {
+        "id": "9c60609747b00250",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "获得坐标",
+        "func": "const features = msg.payload.features;\nvar coordinatesArray = [];\nfor (var i = 0; i < features.length; i++) {\n    const coordinates = features[i].geometry.coordinates;\n    coordinatesArray.push({\n        longitude: coordinates[0],\n        latitude: coordinates[1]\n    });\n}\nmsg.payload = coordinatesArray;\nmsg.topic = \"coordinates\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 220,
+        "wires": [
+            [
+                "240cdf7c1815d6c0"
+            ]
+        ]
+    },
+    {
+        "id": "eb46a6422b77b817",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "获取停车场名称",
+        "func": "const features = msg.payload.features;\nvar namesArray = [];\nfor (var i = 0; i < features.length; i++) {\n    const properties = features[i].properties;\n    namesArray.push({\n        parknames: properties.name_sc,\n        districts: properties.district_sc     \n    });\n}\nmsg.payload = namesArray;\nmsg.topic = \"names\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 260,
+        "wires": [
+            [
+                "240cdf7c1815d6c0"
+            ]
+        ]
+    },
+    {
+        "id": "240cdf7c1815d6c0",
+        "type": "join",
+        "z": "1ad5761267f9aed3",
+        "name": "消息合并",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "useparts": false,
+        "accumulate": false,
+        "timeout": "",
+        "count": "5",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 710,
+        "y": 340,
+        "wires": [
+            [
+                "f4b0d8ad76aba4ce",
+                "a5a061a3468edc0c"
+            ]
+        ]
+    },
+    {
+        "id": "f4b0d8ad76aba4ce",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "停车场信息",
+        "func": "\nlet time =msg.payload.time;\nlet coordinates = msg.payload.coordinates;\nlet names = msg.payload.names;\nlet vacancyInf = msg.payload.vacancyInf;\nlet links = msg.payload.links;\nconst vehicleTypes = {\n    \"C\": \"公共汽车\",\n    \"L\": \"轻型货车\",\n    \"H\": \"重型货车\",\n    \"M\": \"摩托车\",\n    \"P\": \"汽车/货车\",\n    \"T\": \"集装箱车\",\n    \"B\": \"小巴\"\n};\nlet mapMessages = coordinates.map((coord, index) => {\n    let vacancyDetails = [];\n    let totalVacancy = 0;\n\n    if (vacancyInf[index]) {\n        vacancyInf[index].forEach(vacancy => {\n            if (vacancy.vacancy >= 0 && vacancy.vehicle_type) {\n                let vehicleTypeName = vehicleTypes[vacancy.vehicle_type];\n                vacancyDetails.push(`${vehicleTypeName} - ${vacancy.vacancy}个空余车位`);\n                totalVacancy += vacancy.vacancy;\n            }\n        });\n    }\n\n    let iconColor = \"gray\";\n    if (vacancyDetails.length != 0){\n        if (totalVacancy >= 50) {\n            iconColor = \"green\";\n        } else if (totalVacancy > 0 && totalVacancy < 50) {\n            iconColor = \"orange\";\n        } else if (totalVacancy == 0) {\n            iconColor = \"red\";\n        }        \n    }\n\n    let districtInfo = `<strong>${names[index].districts}</strong>`\n    let vacancyMessage = vacancyDetails.length > 0 ? vacancyDetails.join('<br>') : \"暂无数据\";\n    let websiteLink = links[index].website_tc ? `<a href='${links[index].website_tc}' target='_blank'>查看详情</a>` : \"无官网信息\";\n    let photoLink = links[index].carpark_photo ? `<img src='${links[index].carpark_photo}' alt='停车场图片' style='width:100%; max-width:300px;'>` : \"\";\n\n    return {\n        \"name\": names[index].parknames,\n        \"lat\": coord.latitude,\n        \"lon\": coord.longitude,\n        \"layer\": \"Parking\",\n        \"icon\": \"car\",\n        \"iconColor\": iconColor,\n        \"popup\": `<br>${districtInfo}<br><br>${photoLink}<br>剩余车位：</b><br><pre>${vacancyMessage}</pre>更新时间：${time}<br>${websiteLink}`,\n    };\n});\n\nreturn [mapMessages.map(msg => { return { payload: msg }; })];\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 380,
+        "wires": [
+            [
+                "b8b7f666f4df9a29"
+            ]
+        ]
+    },
+    {
+        "id": "b8b7f666f4df9a29",
+        "type": "worldmap",
+        "z": "1ad5761267f9aed3",
+        "name": "",
+        "lat": "22.28",
+        "lon": "114.19",
+        "zoom": "12",
+        "layer": "OSMG",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "show",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "false",
+        "coords": "none",
+        "showgrid": "false",
+        "showruler": "false",
+        "allowFileDrop": "false",
+        "path": "/worldmap",
+        "overlist": "DR,CO,RA,DN,RW",
+        "maplist": "OSMG,OSMC,EsriC,EsriS,UKOS",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 720,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "6db09b62b8d2fe9b",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "车位信息",
+        "func": "const features = msg.payload.features;\nvar vacancyArray = [];\nfor (var i = 0; i < features.length; i++) {\n    const names = features[i].properties.vacancy_url;\n    vacancyArray.push(names);\n}\nmsg.url = vacancyArray;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 340,
+        "wires": [
+            [
+                "78876d20db7dbd2f"
+            ]
+        ]
+    },
+    {
+        "id": "78876d20db7dbd2f",
+        "type": "split",
+        "z": "1ad5761267f9aed3",
+        "name": "vacancy_url处理队列",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "url",
+        "x": 420,
+        "y": 380,
+        "wires": [
+            [
+                "4fa1ddceb0a86be7",
+                "97528f15ac42f9fc",
+                "289120ef5d533808"
+            ]
+        ]
+    },
+    {
+        "id": "4fa1ddceb0a86be7",
+        "type": "http request",
+        "z": "1ad5761267f9aed3",
+        "name": "http request",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 420,
+        "y": 420,
+        "wires": [
+            [
+                "caace80948df5466"
+            ]
+        ]
+    },
+    {
+        "id": "caace80948df5466",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "获取车位信息",
+        "func": "// 检查并移除可能的 BOM 字符\nif (msg.payload.charCodeAt(0) === 0xFEFF) {\n    msg.payload = msg.payload.substr(1);\n}\n\n\nmsg.payload = JSON.parse(msg.payload);\n\n\nvar carParks = msg.payload.car_park;\nvar vacancies = [];\n\ncarParks.forEach(function (carPark) {\n    carPark.vehicle_type.forEach(function (vehicle) {\n        vehicle.service_category.forEach(function (category) {\n            var vacancyInfo = {\n                park_id: carPark.park_id,\n                vehicle_type: vehicle.type,\n                category: category.category,\n                vacancy_type: category.vacancy_type,\n                vacancy: category.vacancy,\n                lastupdate: category.lastupdate\n            };\n            vacancies.push(vacancyInfo);\n        });\n    });\n});\n\nmsg.payload = vacancies;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 470,
+        "wires": [
+            [
+                "33ebd17ac0a4549d",
+                "60505f648b7c92a9",
+                "a24761900cfbcb5a",
+                "093710e929144cf7"
+            ]
+        ]
+    },
+    {
+        "id": "fac8ac2018a12c9a",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "当前时间",
+        "func": "var timeStampDate = new Date(msg.payload.timeStamp);\nvar targetTimeZoneOffset = 8;\nvar utcOffset = -timeStampDate.getTimezoneOffset() / 60;\n\ntimeStampDate.setHours(timeStampDate.getHours() + targetTimeZoneOffset - utcOffset);\n\nvar dateString = timeStampDate.toISOString().substring(0, 10);\nvar timeString = timeStampDate.toTimeString().substring(0, 8);\n\nvar update = dateString + \" \" + timeString;\n\nmsg.payload = update;\nmsg.topic = \"time\";\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 180,
+        "wires": [
+            [
+                "240cdf7c1815d6c0"
+            ]
+        ]
+    },
+    {
+        "id": "33ebd17ac0a4549d",
+        "type": "debug",
+        "z": "1ad5761267f9aed3",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "e50c395fc563cacb",
+        "type": "debug",
+        "z": "1ad5761267f9aed3",
+        "name": "debug 4",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 190,
+        "y": 310,
+        "wires": []
+    },
+    {
+        "id": "14e5551426914d1b",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "加topic信息",
+        "func": "msg.topic = \"vacancyInf\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 550,
+        "wires": [
+            [
+                "240cdf7c1815d6c0"
+            ]
+        ]
+    },
+    {
+        "id": "a5a061a3468edc0c",
+        "type": "debug",
+        "z": "1ad5761267f9aed3",
+        "name": "debug 5",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 940,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "97528f15ac42f9fc",
+        "type": "debug",
+        "z": "1ad5761267f9aed3",
+        "name": "debug 6",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "parts",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "60505f648b7c92a9",
+        "type": "debug",
+        "z": "1ad5761267f9aed3",
+        "name": "debug 7",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "parts",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "a24761900cfbcb5a",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "顺序合并",
+        "func": "let messageList = flow.get('messageList') || [];\n\nmessageList.push(msg);\n\nlet totalMessages = msg.parts.count;\n\nif (messageList.length === totalMessages) {\n    messageList.sort((a, b) => a.parts.index - b.parts.index);\n\n    msg.payload = messageList.map(item => item.payload);\n\n    flow.set('messageList', []);\n\n    return msg;\n} else {\n    flow.set('messageList', messageList);\n    return null;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 510,
+        "wires": [
+            [
+                "7b5a3838ccce3e7a",
+                "14e5551426914d1b"
+            ]
+        ]
+    },
+    {
+        "id": "093710e929144cf7",
+        "type": "debug",
+        "z": "1ad5761267f9aed3",
+        "name": "debug 8",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "7b5a3838ccce3e7a",
+        "type": "debug",
+        "z": "1ad5761267f9aed3",
+        "name": "debug 9",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "a2d3b0dead716ccb",
+        "type": "function",
+        "z": "1ad5761267f9aed3",
+        "name": "获取链接",
+        "func": "const features = msg.payload.features;\nvar linksArray = [];\nfor (var i = 0; i < features.length; i++) {\n    const properties = features[i].properties;\n    linksArray.push({\n        website_tc: properties.website_tc, \n        carpark_photo: properties.carpark_photo\n    });\n}\n\nmsg.payload = linksArray;\nmsg.topic = \"links\";890\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 300,
+        "wires": [
+            [
+                "240cdf7c1815d6c0"
+            ]
+        ]
+    },
+    {
+        "id": "289120ef5d533808",
+        "type": "debug",
+        "z": "1ad5761267f9aed3",
+        "name": "debug 10",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "parts",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 660,
+        "y": 510,
+        "wires": []
+    },
+    {
+        "id": "ecc26120.5c01a8",
+        "type": "mongodb3",
+        "uri": "mongodb://192.168.88.130:27017/admin",
+        "name": "HKO",
+        "options": "",
+        "parallelism": "-1"
+    }
+]
