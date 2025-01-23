@@ -1,0 +1,11 @@
+Date: Thu, 22 Apr 1993 13:11:13 +0000
+
+I have a 105MB IDE drive and am having a few problems! I get 
+'Data error on drive C' messages when reading some files. The problem is
+also steadily getting worse.
+
+I have run some diagnostic software (PCTools V7.1) and it says that the
+drive is OK - but it does have to retry some sectors and it briefly 
+flashes up an error message (which is too quick to read).
+
+Does anybody know of any cheap or free software which could mark these

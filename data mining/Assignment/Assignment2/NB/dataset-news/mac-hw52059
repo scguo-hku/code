@@ -1,0 +1,14 @@
+Organization: NASA/GSFC
+X-Useragent: Nuntius v1.1.1d20
+Date: Wed, 21 Apr 1993 18:00:26 GMT
+Lines: 15
+
+writes:
+>One way to tell is to
+>go and open the PowerBook control panel(7.1).  There is a setting
+>there that allows you to set the time to wake up the Mac.  If it
+>is present when you open the control panel, then you can assume that
+>SetWUTime will work.  
+
+Gee, nice of them to tell us.  Like, how about a Gestalt response bit for
+the

@@ -1,0 +1,24 @@
+Organization: Pontificia Universidad Catolica de Chile
+X-Newsreader: TIN [version 1.1 PL8]
+Date: Mon, 26 Apr 1993 18:55:30 GMT
+Lines: 25
+
+
+> My co-worker has just attached a magneto-optical drive to his mac.
+> Works Great for him.  However, he tried to turn on file sharing, but it
+> wouldn't work.  Had some message about "Not all volumes are shareable"
+> ???
+
+> So - has anyone had success in sharing MOs?  If so, please tell me how!
+
+Hi.
+
+He needs insert the MO before FileSharing get turned on, and the only one
+that can see the disk is the owner of the machine. (I'm not sure but seems
+that the check "Allow owner to see entire disk" should be enabled too).
+
+A bad thing: you can't eject the disk until FS is turned off.
+
+Hope that helps.
+
+--
