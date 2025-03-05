@@ -50,6 +50,26 @@ class task_2_2:
         
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+         # compute the frequency spectrum of the signal
+        s_f = fft(s_t)
+        s_f_len = len(s_f)
+        s_f_freq = fftfreq(s_f_len, d=1/fs)
+        s_f = np.abs(s_f[:s_f_len//2])
+        s_f_freq = s_f_freq[:s_f_len//2]
+        
+        # find the peaks in the frequency spectrum
+        peaks, _ = find_peaks(s_f)
+        
+        # get the frequency and magnitude of the peaks
+        peak_freqs = s_f_freq[peaks]
+        peak_mags = s_f[peaks]
+        
+        # sort the peaks in descending order of magnitude
+        sorted_indices = np.argsort(peak_mags)[::-1]
+        primary_freqs = peak_freqs[sorted_indices][:3]
+        
+        # ensure the output is of type float64
+        freq = np.array(primary_freqs).astype(np.float64)
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         
         freq = np.sort(freq)[::-1]
@@ -75,6 +95,23 @@ class task_2_2:
         
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+        # compute the frequency spectrum of the signal
+        s_f = fft(s_t)
+        s_f_len = len(s_f)
+        s_f_freq = fftfreq(s_f_len, d=1/fs)
+        s_f = np.abs(s_f[:s_f_len//2])
+        s_f_freq = s_f_freq[:s_f_len//2]
+        
+        # find the peaks in the frequency spectrum
+        threshold = np.max(s_f) * 0.01  # find peaks above 1% of the maximum value
+        significant_indices = np.where(s_f > threshold)[0]
+        if len(significant_indices) > 0:
+            bw = s_f_freq[significant_indices[-1]] - s_f_freq[significant_indices[0]]
+        else:
+            bw = 0
+        
+        # ensure the output is of type float64
+        bw = np.float64(bw)
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         
         return bw 
@@ -98,6 +135,13 @@ class task_2_2:
         
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+        # find the peaks in the ECG signal
+        peaks, _ = find_peaks(s_t, distance=fs/2)  # set the minimum distance
+        
+        # calculate
+        peak_intervals = np.diff(peaks) / fs  # calculate the time intervals between peaks
+        avg_peak_interval = np.mean(peak_intervals)  # calculate the average peak interval
+        hr = 60 / avg_peak_interval  # calculate the heart rate
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         
         # Make sure hr is a float64

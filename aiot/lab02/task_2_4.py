@@ -40,6 +40,7 @@ class task_2_4:
         \[
             s(t) = \exp\left(j \cdot 2\pi \cdot (f_s \cdot + \dfrac{B}{2 \cdot T} \cdot t)\cdot t\right)
         \]
+
         
         Returns:
             tx (np.ndarray): The transmitted signal.
@@ -49,10 +50,16 @@ class task_2_4:
         >>> round(tx[-1].imag, 1)
         -0.7
         """
-        tx = None
+
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+        # generate time stamp array
+        t = np.linspace(0, T, int(Fs * T), endpoint=False)
+        
+        # generate the transmitted signal
+        tx = np.exp(1j * 2 * np.pi * (fc * t + (B / (2 * T)) * t**2))
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
+
         return tx
     
     def compute_if_signal(self):
@@ -72,10 +79,12 @@ class task_2_4:
         >>> round(if_signal[-1][-1].imag, 1)
         -1.3
         """
+        
         tx = self.generate_transmitted_signal()
         if_signal = None
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+        if_signal = tx * np.conjugate(self.rx_data)
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         return if_signal
     
@@ -99,6 +108,25 @@ class task_2_4:
         range_bins = None # Range bins
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+        N = if_signal.shape[-1]
+        # compute the FFT
+        range_fft = np.fft.fft(if_signal, n=N, axis=-1)
+        # compute the magnitude of the FFT
+        range_fft_mag = np.abs(range_fft)
+        
+        # compute the average spectrum
+        avg_range_spectrum = np.mean(range_fft_mag, axis=0)
+        
+        # compute the range bins
+        freq_bins = np.arange(N) / N * Fs
+        range_bins = (c * freq_bins * T) / (2 * B)
+        
+        # find the peaks in the average spectrum
+        peaks, _ = find_peaks(avg_range_spectrum, height=np.max(avg_range_spectrum) * 0.2)  # take the peaks above 20% of the maximum value
+        
+        # get the range corresponding to the peaks
+        top_peaks = peaks[np.argsort(avg_range_spectrum[peaks])][-2:]
+        distances = range_bins[top_peaks]
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         distances = np.sort(distances)
         return distances, range_fft, range_bins
@@ -117,9 +145,36 @@ class task_2_4:
         >>> all(isinstance(v, float) for v in aoas.values())
         True
         """
-        _, range_fft, range_bins = self.estimate_distance()
+        distances, range_fft, range_bins = self.estimate_distance()
         aoas = {}
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+        # compute the wavelength
+        wavelength = c / fc
+        # assume the distance to the target is the same
+        s = wavelength / 2
+        
+        # find the top peaks in the range FFT
+        top_peaks_idx = []
+        for dist in distances:
+            # find the index of the range bin closest to the distance
+            idx = np.argmin(np.abs(range_bins - dist))
+            top_peaks_idx.append(idx)
+
+        # retrieve the AoA for each target
+        for i, peak_idx in enumerate(top_peaks_idx):
+            # get the range profile for the target
+            antenna_values = range_fft[:, peak_idx]
+            
+            phase_0 = np.angle(antenna_values[0])
+            phase_1 = np.angle(antenna_values[1])
+            delta_phase = phase_1 - phase_0
+            
+            # theta = arcsin( (delta_phase * wavelength) / (2*pi*d) )
+            theta = np.arcsin((delta_phase * wavelength) / (2 * np.pi * s))
+            
+            # convert to degrees
+            aoa_degree = np.degrees(theta)
+            aoas[f"target_{i+1}"] = round(aoa_degree, 1)
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         return aoas

@@ -43,20 +43,42 @@ class task_2_3:
         >>> [round(x, 2) for x in f]
         [50.99, 51.0, 51.02]
         """
-        fs = None  # Define the appropriate sampling rate
-        N = None  # Define the number of samples
 
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO: Set the appropriate fs and N
+        fs = 100000  # Define the appropriate sampling rate
+        N = 20000000  # Define the number of samples
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         
         t = np.arange(-N / (2 * fs), N / (2 * fs),  1/fs)
         s_t = self.func1(t) # signal function
         
-        f = np.zeros(3, dtype=np.float64) # frequency list
-        
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO: Compute the FFT and get the frequency list
+        # generate time stamp array
+        t = np.arange(-N / (2 * fs), N / (2 * fs), 1 / fs)
+        s_t = self.func1(t)  # signal function
+        
+        # compute the FFT
+        s_f = fft(s_t)
+        s_f_len = len(s_f)
+        s_f_freq = fftfreq(s_f_len, d=1 / fs)
+        s_f = np.abs(s_f[:s_f_len // 2])
+        s_f_freq = s_f_freq[:s_f_len // 2]
+        
+        # find the peaks in the frequency spectrum
+        peaks, _ = find_peaks(s_f, height=np.max(s_f) * 0.1)  # set the threshold to 10% of the maximum value
+        
+        # get the frequency and magnitude of the peaks
+        peak_freqs = s_f_freq[peaks]
+        peak_mags = s_f[peaks]
+        
+        # sort the peaks in descending order of magnitude
+        sorted_indices = np.argsort(peak_mags)[::-1]
+        primary_freqs = peak_freqs[sorted_indices][:3]
+        
+        # ensure the output is of type float64
+        f = np.array(primary_freqs).astype(np.float64)
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         
         fs = float(fs)
@@ -87,20 +109,38 @@ class task_2_3:
         >>> [round(x, 2) for x in f]
         [51.2, 1000.6, 2000.0]
         """
-        fs = None  # Define the appropriate sampling rate
-        N = None  # Define the number of samples
 
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO: Set the appropriate fs and N
+        fs = 100000  # Define the appropriate sampling rate
+        N = 1000000  # Define the number of samples
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         
         t = np.arange(-N / (2 * fs), N / (2 * fs),  1/fs)
         s_t = self.func2(t) # signal function
         
-        f = np.zeros(3, dtype=np.float64) # frequency list
-        
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO: Compute the FFT and get the frequency list
+        # compute the FFT
+        s_f = fft(s_t)
+        s_f_len = len(s_f)
+        s_f_freq = fftfreq(s_f_len, d=1 / fs)
+        s_f = np.abs(s_f[:s_f_len // 2])
+        s_f_freq = s_f_freq[:s_f_len // 2]
+        
+        # find the peaks in the frequency spectrum
+        peaks, _ = find_peaks(s_f, height=np.max(s_f) * 0.1)  # set the threshold to 10% of the maximum value
+        
+        # get the frequency and magnitude of the peaks
+        peak_freqs = s_f_freq[peaks]
+        peak_mags = s_f[peaks]
+        
+        # sort the peaks in descending order of magnitude
+        sorted_indices = np.argsort(peak_mags)[::-1]
+        primary_freqs = peak_freqs[sorted_indices][:3]
+        
+        # ensure the output is of type float64
+        f = np.array(primary_freqs).astype(np.float64)
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         
         fs = float(fs)

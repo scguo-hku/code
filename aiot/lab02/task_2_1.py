@@ -42,6 +42,16 @@ class task_2_1:
         
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+        # generate the pure tone signal in time domain
+        s_t = 2.025 * np.cos(2 * np.pi * 20.25 * self.t + np.pi / 3)
+
+        # compute the frequency spectrum of the signal
+        s_f = fft(s_t)
+        s_f_len = len(s_f)
+        s_f_freq = fftfreq(s_f_len, d=1/self.fs)
+        s_f = s_f[0:s_f_len//2]
+        s_f_freq = s_f_freq[0:s_f_len//2]
+        s_f = np.abs(s_f)
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
 
         
