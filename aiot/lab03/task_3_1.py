@@ -88,7 +88,7 @@ class task_3_1:
         s_t[(t >= 0.3) & (t < 0.9)] = 3
         s_t[(t >= 1.2) & (t < 1.8)] = 2
         
-        # 计算自相关
+        # compute ACF
         acf = correlate(s_t, s_t, mode='full')
         
         n = len(acf)
