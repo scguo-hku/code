@@ -64,7 +64,10 @@ class task_4_2:
         filtered = None
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO: 
-        #
+        # use Savitzky-Golay filter
+        window_length = 51  # window size
+        polyorder = 3       # polynomial order
+        filtered = savgol_filter(self.data1, window_length, polyorder)
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         filtered = np.array(filtered, dtype=np.float64)
         return filtered
@@ -98,12 +101,20 @@ class task_4_2:
         >>> dv = test._compute_derivative_variation(filtered)
         >>> dv < 0.1
         True
-        True
         """
         filtered = None
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO: 
-        # 
+        # use Hampel filter
+        window_size = 23  # window size
+        res = hampel(self.data2, window_size, n_sigma=0.08)
+        filtered = res.filtered_data
+
+        # use Savitzky-Golay filter
+        window_length = 51  # window size
+        polyorder = 3       # polynomial order
+        filtered = savgol_filter(filtered, window_length, polyorder)
+
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         filtered = np.array(filtered, dtype=np.float64)
         return filtered

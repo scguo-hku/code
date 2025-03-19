@@ -51,8 +51,26 @@ class task_4_3:
         frequency = []
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+        # compute FFT
+        fft_values = fft(s)
+        fft_freqs = fftfreq(len(s), 1/fs)
+
+        # compute positive frequencies
+        positive_freqs = fft_freqs[:len(fft_freqs)//2]
+        positive_fft_values = np.abs(fft_values[:len(fft_values)//2])
+
+        # find peaks
+        peaks, _ = find_peaks(positive_fft_values)
+
+        # if the number of peaks is less than 2, return the same frequency twice
+        if len(peaks) < 2:
+            dominant_freqs = np.array([positive_freqs[peaks[0]], positive_freqs[peaks[0]]])
+        else:
+            peak_indices = np.argsort(positive_fft_values[peaks])[-2:]
+            dominant_freqs = positive_freqs[peaks][peak_indices]
+            dominant_freqs = np.sort(dominant_freqs)
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
-        frequency = np.array(frequency, dtype=np.float64)
+        frequency = np.array(dominant_freqs, dtype=np.float64)
         return frequency
         
     def demodulate_signal(self, s, fs, fc):
@@ -84,8 +102,27 @@ class task_4_3:
         demo_signal = None
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+        # generate carrier signal
+        t = np.arange(len(s)) / fs
+        carrier = np.cos(2 * np.pi * fc * t)
+
+        # multiply the signal with the carrier signal
+        mixed_signal = s * carrier
+
+        # apply low-pass filter
+        cutoff = 10
+        sos = butter(5, cutoff, btype='lowpass', fs=fs, output='sos')
+
+        # apply the filter
+        demodulated_signal = sosfiltfilt(sos, mixed_signal)
+
+        # remove the DC component
+        demodulated_signal -= np.mean(demodulated_signal)
+
+        # normalize the signal
+        demodulated_signal /= np.max(np.abs(demodulated_signal))
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
-        demo_signal = np.array(demo_signal, dtype=np.float64)
+        demo_signal = np.array(demodulated_signal, dtype=np.float64)
         return demo_signal
     
 
@@ -119,6 +156,14 @@ class task_4_3:
         interpolated_signal = None
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO: 
+        # find the indices of non-NaN values
+        not_nan_indices = np.where(~np.isnan(s))[0]
+        # find the indices of NaN values
+        nan_indices = np.where(np.isnan(s))[0]
+
+        # interpolate the NaN values
+        interpolated_signal = np.copy(s)
+        interpolated_signal[nan_indices] = np.interp(nan_indices, not_nan_indices, s[not_nan_indices])
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         interpolated_signal = np.array(interpolated_signal, dtype=np.float64)
         return interpolated_signal
@@ -146,10 +191,15 @@ class task_4_3:
         True
         
         """
-        interpolated_signal = self.interpolate_signal(self.imu_signal)
+        interpolated_signal = self.interpolate_signal(s)
         filtered_signal = None
         # >>>>>>>>>>>>>>> YOUR CODE HERE <<<<<<<<<<<<<<<
         # TODO:
+        cutoff = 2  # cutoff frequency
+        sos = butter(5, cutoff, btype='lowpass', fs=fs, output='sos')
+
+        # apply the filter
+        filtered_signal = sosfiltfilt(sos, interpolated_signal)
         # >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<
         filtered_signal = np.array(filtered_signal, dtype=np.float64)
         return filtered_signal

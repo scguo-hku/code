@@ -5,7 +5,7 @@
 ### (1)
 
 $$
-\pi_{\text{title}} \left( \sigma_{\text{genre} = ' \text{Novel} ' \land \text{language} = ' \text{Chinese} '} (\textbf{Book}) \right)
+\pi_{\text{title}} \left( \sigma_{\text{genre} = ' \text{Novel} ' \land \text{language} = ' \text{Chinese} '} ({Book}) \right)
 $$
 
 
@@ -13,7 +13,7 @@ $$
 ### (2)
 
 $$
-\pi_{name}(\sigma_{gender='Ms.'}((Customer \bowtie Borrow) \bowtie (\sigma_{genre='Novel'}(Book)) \land dueDate='01-01-2025')
+\pi_{name}(\sigma_{gender='Ms.' \land dueDate='01-01-2025'}((Customer \bowtie Borrow) \bowtie (\sigma_{genre='Novel'}(Book)))
 $$
 
 
